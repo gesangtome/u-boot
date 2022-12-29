@@ -24,8 +24,8 @@ extern "C" {
 #define CURR_SYSTEM_SLOT_SUFFIX "ab"
 #define VBMETA_MAX_SIZE 65536
 #define ROLLBACK_MAX_SIZE 20
-#define LOCK_MASK 0x1
-#define UNLOCK_DISABLE_MASK 0x2
+#define LOCK_MASK (1 << 0)
+#define UNLOCK_DISABLE_MASK (1 << 1)
 #define VBOOT_STATE_SIZE    1000
 #define PERM_ATTR_SUCCESS_FLAG 1
 /* soc-v use the rsa2048 */

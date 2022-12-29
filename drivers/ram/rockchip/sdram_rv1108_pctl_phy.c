@@ -4,6 +4,7 @@
  */
 
 #include <common.h>
+#if defined(CONFIG_SPL_BUILD) || defined(CONFIG_TPL_BUILD)
 #include <debug_uart.h>
 #include <dm.h>
 #include <dm/root.h>
@@ -640,3 +641,4 @@ re_training:
 
 	return 0;
 }
+#endif /* CONFIG_TPL_BUILD */

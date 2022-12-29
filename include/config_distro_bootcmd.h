@@ -56,9 +56,32 @@
 	BOOT_TARGET_DEVICES_references_HOST_without_CONFIG_SANDBOX
 #endif
 
+#if ((defined CONFIG_CMD_PCI) && (defined CONFIG_CMD_NVME))
+#define BOOTENV_SHARED_NVME  BOOTENV_SHARED_BLKDEV(nvme)
+#define BOOTENV_DEV_NVME(devtypeu, devtypel, instance) \
+	"bootcmd_nvme=" \
+		"pci enum;" \
+		"nvme scan;" \
+		"setenv devnum 0;" \
+		"run nvme_boot;" \
+		"\0"
+#define BOOTENV_DEV_NAME_NVME(devtypeu, devtypel, instance)  "nvme "
+#else
+#define BOOTENV_SHARED_NVME
+#define BOOTENV_DEV_NVME(devtypeu, devtypel, instance) \
+	BOOT_TARGET_DEVICES_references_NVME_without_CONFIG_CMD_NVME
+#define BOOTENV_DEV_NAME_NVME(devtypeu, devtypel, instance) \
+	BOOT_TARGET_DEVICES_references_NVME_without_CONFIG_CMD_NVME
+#endif
+
 #ifdef CONFIG_CMD_MMC
 #define BOOTENV_SHARED_MMC	BOOTENV_SHARED_BLKDEV(mmc)
-#define BOOTENV_DEV_MMC		BOOTENV_DEV_BLKDEV
+#define BOOTENV_DEV_MMC(devtypeu, devtypel, instance) \
+        "bootcmd_mmc1=" \
+                "mmc list;" \
+                "setenv devnum 1;" \
+                "run mmc_boot;" \
+                "\0"
 #define BOOTENV_DEV_NAME_MMC	BOOTENV_DEV_NAME_BLKDEV
 #else
 #define BOOTENV_SHARED_MMC
@@ -162,20 +185,13 @@
 #endif
 
 #ifdef CONFIG_SCSI
-#define BOOTENV_RUN_SCSI_INIT "run scsi_init; "
-#define BOOTENV_SET_SCSI_NEED_INIT "setenv scsi_need_init; "
-#define BOOTENV_SHARED_SCSI \
-	"scsi_init=" \
-		"if ${scsi_need_init}; then " \
-			"setenv scsi_need_init false; " \
-			"scsi scan; " \
-		"fi\0" \
-	\
-	"scsi_boot=" \
-		BOOTENV_RUN_SCSI_INIT \
-		BOOTENV_SHARED_BLKDEV_BODY(scsi)
-#define BOOTENV_DEV_SCSI	BOOTENV_DEV_BLKDEV
-#define BOOTENV_DEV_NAME_SCSI	BOOTENV_DEV_NAME_BLKDEV
+#define BOOTENV_SHARED_SCSI  BOOTENV_SHARED_BLKDEV(scsi)
+#define BOOTENV_DEV_SCSI(devtypeu, devtypel, instance) \
+	"bootcmd_scsi=" \
+		"scsi scan;" \
+                "run scsi_boot;" \
+                "\0"
+#define BOOTENV_DEV_NAME_SCSI(devtypeu, devtypel, instance)  "scsi "
 #else
 #define BOOTENV_RUN_SCSI_INIT
 #define BOOTENV_SET_SCSI_NEED_INIT
@@ -314,6 +330,7 @@
 	BOOTENV_DEV_##devtypeu(devtypeu, devtypel, instance)
 #define BOOTENV \
 	BOOTENV_SHARED_HOST \
+	BOOTENV_SHARED_NVME \
 	BOOTENV_SHARED_MMC \
 	BOOTENV_SHARED_PCI \
 	BOOTENV_SHARED_USB \
@@ -380,7 +397,7 @@
 	\
 	BOOT_TARGET_DEVICES(BOOTENV_DEV)                                  \
 	\
-	"distro_bootcmd=" BOOTENV_SET_SCSI_NEED_INIT                      \
+	"distro_bootcmd=" 			                          \
 		"for target in ${boot_targets}; do "                      \
 			"run bootcmd_${target}; "                         \
 		"done\0"

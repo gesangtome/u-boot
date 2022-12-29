@@ -1215,7 +1215,7 @@
 		linux,pci-domain = <4>;
 		num-ib-windows = <8>;
 		num-ob-windows = <8>;
-		max-link-speed = <2>;
+		max-link-speed = <1>;
 		msi-map = <0x4000 &its 0x4000 0x1000>;
 		num-lanes = <1>;
 		phys = <&combphy0_ps PHY_TYPE_PCIE>;
